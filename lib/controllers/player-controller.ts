@@ -40,10 +40,10 @@ export class PlayerController {
     this.velocity.x = 0;
     this.velocity.z = 0;
 
-    if (forward) this.velocity.z = this.speed;
-    if (backward) this.velocity.z = -this.speed;
-    if (leftward) this.velocity.x = this.speed;
-    if (rightward) this.velocity.x = -this.speed;
+    if (forward) this.velocity.z = -this.speed;
+    if (backward) this.velocity.z = this.speed;
+    if (leftward) this.velocity.x = -this.speed;
+    if (rightward) this.velocity.x = this.speed;
 
     if (this.rigidBodyRef) {
       this.rigidBodyRef.setLinvel(
@@ -58,35 +58,7 @@ export class PlayerController {
     }
   }
 
-  update({
-    controls,
-    cameraObjects: {
-      camera,
-      cameraPosition,
-      cameraTarget,
-      cameraWorldPosition,
-      cameraLookAtWorldPosition,
-      cameraLookAt,
-    },
-  }: {
-    controls: Controls;
-    cameraObjects: {
-      camera: THREE.Camera;
-      cameraPosition: THREE.Group;
-      cameraTarget: THREE.Group;
-      cameraWorldPosition: THREE.Vector3;
-      cameraLookAtWorldPosition: THREE.Vector3;
-      cameraLookAt: THREE.Vector3;
-    };
-  }): void {
+  update({ controls }: { controls: Controls }): void {
     this.movePlayer(controls);
-
-    cameraPosition.getWorldPosition(cameraWorldPosition);
-    camera.position.lerp(cameraWorldPosition, 0.1);
-
-    cameraTarget.getWorldPosition(cameraLookAtWorldPosition);
-    cameraLookAt.lerp(cameraLookAtWorldPosition, 0.1);
-
-    camera.lookAt(cameraLookAt);
   }
 }

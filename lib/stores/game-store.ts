@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 
 // Settings
 import { PLAYER_CLASS_CONFIG } from "@/lib/settings/player";
+import { CAMERA_POSITION } from "@/lib/settings/camera";
 
 // Types
 import { Player, PlayerClass } from "@/lib/types/player";
@@ -30,9 +31,9 @@ export const useGameStore = create<GameState>()(
         rotationSpeed: 15,
       },
       camera: {
-        position: { x: 0, y: 0, z: 10 },
-        rotation: { x: 0, y: 0, z: 0 },
-        fov: 100,
+        position: CAMERA_POSITION,
+        rotation: { x: -Math.PI / 3, y: 0, z: 0 },
+        fov: 7,
       },
 
       initPlayerState(playerClass: PlayerClass) {
