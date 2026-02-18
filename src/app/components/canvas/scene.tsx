@@ -1,55 +1,86 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+// Store
+import { useGameStore } from "@/lib/stores/game-store";
 
-import { CameraHelper } from "@/app/components/helper/camera-helper";
+// Components
+import { Canvas } from "@react-three/fiber";
+import { KeyboardControls } from "@react-three/drei";
+import { Physics, RigidBody } from "@react-three/rapier";
+import { Player } from "@/src/app/components/player/index";
+import { Camera } from "@/src/app/components/camera/index";
+
+// Settings
+import { keyboardMap } from "@/lib/settings/keyboard";
+
+import { PlayerClass } from "@/lib/types/player";
 
 export default function Scene() {
+  // TODO: make a different screen/overlay for the selection menu and call the initPlayerState
+  const initPlayerState = useGameStore((state) => state.initPlayerState);
+
+  initPlayerState(PlayerClass.SPHERE);
+
   return (
     <div className="canvas-container h-full w-full">
-      <Canvas
-        shadows
-        camera={{ position: [0, 5, 2], fov: 100 }}
-        onCreated={({ camera }) => {
-          camera.rotation.set(-Math.PI / 4, 0, 0); // 45°
-          camera.lookAt(0, 0, 0);
-          camera.updateProjectionMatrix();
-        }}
-      >
-        {/* Helpers */}
-        <OrbitControls />
-        {/* <CameraHelper /> */}
+      <KeyboardControls map={keyboardMap}>
+        <Canvas dpr={[1, 2]} shadows>
+          {/* Lights */}
+          <ambientLight intensity={0.75} />
 
-        {/* Lights */}
-        <ambientLight intensity={0.5} />
+          <directionalLight
+            position={[0, 10, 5]}
+            intensity={2.5}
+            castShadow
+            shadow-mapSize={[1024, 1024]}
+            // shadow-camera-near={1}
+            // shadow-camera-far={10}
+            // shadow-camera-top={2}
+            // shadow-camera-bottom={-2}
+            // shadow-camera-left={-2}
+            // shadow-camera-right={2}
+            // shadow-bias={-0.0005}
+          />
 
-        <directionalLight
-          position={[0, 5, -5]}
-          intensity={3}
-          castShadow
-          shadow-mapSize={[1024, 1024]}
-          shadow-camera-near={1}
-          shadow-camera-far={10}
-          shadow-camera-top={2}
-          shadow-camera-bottom={-2}
-          shadow-camera-left={-2}
-          shadow-camera-right={2}
-          shadow-bias={-0.0005}
-        />
+          {/* Camera */}
+          <Camera />
 
-        <group>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-            <planeGeometry args={[50, 50]} />
-            <meshStandardMaterial color="green" />
-          </mesh>
+          <Physics debug={true} timeStep="vary">
+            <group>
+              {/* Terrain */}
+              <RigidBody type="fixed" friction={1}>
+                <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+                  <planeGeometry args={[100, 100]} />
+                  <meshStandardMaterial color="green" />
+                </mesh>
+              </RigidBody>
 
-          <mesh position={[0, 0.25, 0]} castShadow>
-            <sphereGeometry args={[0.25, 32, 32]} />
-            <meshStandardMaterial color="red" />
-          </mesh>
-        </group>
-      </Canvas>
+              {/* Player */}
+              <Player />
+
+              {/* Towers/Obstacles */}
+              {[
+                [-2, 0.5, -2],
+                [2, 0.5, -2],
+                [-2, 0.5, 2],
+                [2, 0.5, 2],
+              ].map((pos, index) => (
+                <RigidBody
+                  key={index}
+                  type="fixed"
+                  position={pos as [number, number, number]}
+                  colliders="cuboid"
+                >
+                  <mesh castShadow receiveShadow>
+                    <boxGeometry args={[0.5, 1, 0.5]} />
+                    <meshStandardMaterial color="gray" />
+                  </mesh>
+                </RigidBody>
+              ))}
+            </group>
+          </Physics>
+        </Canvas>
+      </KeyboardControls>
     </div>
   );
 }
