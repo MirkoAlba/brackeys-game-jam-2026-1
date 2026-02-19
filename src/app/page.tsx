@@ -1,9 +1,13 @@
-import MainScene from "@/src/app/components/canvas/scene";
+// Components
+import { Canvas } from "@/src/app/components/canvas/index";
+import { MainMenu } from "@/src/app/components/ui/main-menu";
 
 export default function Home() {
   return (
     <main className="flex items-center justify-center h-dvh">
-      <MainScene />
+      <MainMenu />
+
+      <Canvas />
     </main>
   );
 }

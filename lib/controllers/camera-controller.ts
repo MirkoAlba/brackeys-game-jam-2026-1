@@ -1,52 +1,66 @@
-import * as THREE from "three";
-
-// Store
-import { useGameStore } from "../stores/game-store";
-
-// Settings
-import { CAMERA_POSITION } from "@/lib/settings/camera";
+// Controllers
+import { PlayerController } from "./player-controller";
 
 // Types
 import { type PerspectiveCamera } from "three";
+import { type Camera } from "@/lib/types/camera";
+import { CAMERA_POSITION } from "../settings/camera";
 
 export class CameraController {
-  private cameraRef: PerspectiveCamera | null = null;
+  static _instance: CameraController;
 
-  private cameraOffset: THREE.Vector3 = CAMERA_POSITION as THREE.Vector3;
+  private cameraRef!: PerspectiveCamera;
 
-  mapBounds = {
-    minX: -50,
-    maxX: 50,
-    minZ: -50,
-    maxZ: 50,
-  };
+  private position!: { x: number; y: number; z: number };
+  private rotation!: { x: number; y: number; z: number };
+  private fov!: number;
 
-  init(cameraOptions: { cameraRef: PerspectiveCamera }) {
-    this.cameraRef = cameraOptions.cameraRef;
+  private cameraOffset: { x: number; y: number; z: number } = CAMERA_POSITION;
 
-    const cameraState = useGameStore.getState().camera;
+  static getInstance(): CameraController {
+    if (!CameraController._instance) {
+      CameraController._instance = new CameraController();
+    }
+    return CameraController._instance;
+  }
+
+  init(camera: Camera): void {
+    this.position = camera.position;
+    this.rotation = camera.rotation;
+    this.fov = camera.fov;
+  }
+
+  setRefs({ cameraRef }: { cameraRef: PerspectiveCamera }): void {
+    this.cameraRef = cameraRef;
+
+    if (!this.position || !this.fov || !this.rotation) return;
 
     this.cameraRef.position.set(
-      cameraState.position.x,
-      cameraState.position.y,
-      cameraState.position.z,
+      this.position.x,
+      this.position.y,
+      this.position.z,
     );
-    this.cameraRef.fov = cameraState.fov;
+    this.cameraRef.fov = this.fov;
     this.cameraRef.rotation.set(
-      cameraState.rotation.x,
-      cameraState.rotation.y,
-      cameraState.rotation.z,
+      this.rotation.x,
+      this.rotation.y,
+      this.rotation.z,
     );
   }
 
-  update() {
+  followPlayer(): void {
     if (!this.cameraRef) return;
-    const playerPosition = useGameStore.getState().player.position;
+
+    const playerPosition = PlayerController.getInstance().position;
 
     this.cameraRef.position.set(
       playerPosition.x + this.cameraOffset.x,
       playerPosition.y + this.cameraOffset.y,
       playerPosition.z + this.cameraOffset.z,
     );
+  }
+
+  update({ delta }: { delta: number }): void {
+    this.followPlayer();
   }
 }

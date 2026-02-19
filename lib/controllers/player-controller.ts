@@ -1,40 +1,48 @@
 import * as THREE from "three";
 
 // Stores
-import { useGameStore } from "@/lib/stores/game-store";
+// import { useGameStore } from "@/lib/stores/game-store";
 
 // Types
-import type { PlayerClass } from "@/lib/types/player";
+import type { Player, PlayerClass } from "@/lib/types/player";
 import { type RapierRigidBody } from "@react-three/rapier";
 import { type Controls } from "@/lib/types/controls";
 
 export class PlayerController {
-  private rigidBodyRef: RapierRigidBody | null = null;
-  private position: { x: number; y: number; z: number } = { x: 0, y: 0, z: 0 };
-  private velocity: { x: number; y: number; z: number } = { x: 0, y: 0, z: 0 };
+  static _instance: PlayerController;
 
-  private class: PlayerClass | null = null;
-  private health: number = 100;
-  private attack: number = 15;
-  private speed: number = 1;
+  private rigidBodyRef!: RapierRigidBody;
+  position!: { x: number; y: number; z: number };
+  private velocity!: { x: number; y: number; z: number };
+
+  private class!: PlayerClass;
+  private health!: number;
+  private attack!: number;
+  private speed!: number;
   private rotationSpeed: number = 15;
 
-  init(playerOptions: { rigidBodyRef: RapierRigidBody }) {
-    this.rigidBodyRef = playerOptions.rigidBodyRef;
-
-    const playerState = useGameStore.getState().player;
-
-    this.position = playerState.position;
-    this.velocity = playerState.velocity;
-
-    this.class = playerState.class as PlayerClass;
-    this.health = playerState.health;
-    this.attack = playerState.attack;
-    this.speed = playerState.speed;
-    this.rotationSpeed = playerState.rotationSpeed;
+  static getInstance(): PlayerController {
+    if (!PlayerController._instance) {
+      PlayerController._instance = new PlayerController();
+    }
+    return PlayerController._instance;
   }
 
-  movePlayer(controls: Controls) {
+  init(player: Player): void {
+    this.position = player.position;
+    this.velocity = player.velocity;
+    this.class = player.class as PlayerClass;
+    this.health = player.health;
+    this.attack = player.attack;
+    this.speed = player.speed;
+    this.rotationSpeed = player.rotationSpeed;
+  }
+
+  setRefs({ rigidBodyRef }: { rigidBodyRef: RapierRigidBody }): void {
+    this.rigidBodyRef = rigidBodyRef;
+  }
+
+  movePlayer(controls: Controls): void {
     const { forward, backward, leftward, rightward } = controls;
 
     this.velocity.x = 0;
@@ -58,7 +66,7 @@ export class PlayerController {
     }
   }
 
-  update({ controls }: { controls: Controls }): void {
+  update({ delta, controls }: { delta: number; controls: Controls }): void {
     this.movePlayer(controls);
   }
 }

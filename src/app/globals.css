@@ -1,4 +1,25 @@
 @import "tailwindcss";
+@plugin "tw-bootstrap-grid";
+
+@theme {
+  --breakpoint-sm: 40rem; /* 640px */
+  --breakpoint-md: 48rem; /* 768px */
+  --breakpoint-lg: 64rem; /* 1024px */
+  --breakpoint-xl: 80rem; /* 1280px */
+  --breakpoint-2xl: 96rem; /* 1536px */
+
+  /* Global gutter variables */
+  --bs-global-gutter-x: 1.5rem;
+  --bs-global-gutter-y: 0;
+
+  /* Container-specific */
+  --bs-container-gutter-x: var(--bs-global-gutter-x);
+  --bs-container-gutter-y: var(--bs-global-gutter-y);
+
+  /* Row-specific */
+  --bs-row-gutter-x: var(--bs-global-gutter-x);
+  --bs-row-gutter-y: var(--bs-global-gutter-y);
+}
 
 :root {
   --background: #ffffff;
@@ -8,8 +29,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-pixelify-sans);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +42,32 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Pixelify Sans", sans-serif;
+}
+
+/* Buttons */
+
+button {
+  font-weight: bold;
+  padding: 10px 20px;
+  border: 0;
+  box-shadow:
+    0px 5px black,
+    0px -5px black,
+    5px 0px black,
+    -5px 0px black,
+    0px 10px #00000038,
+    5px 5px #00000038,
+    -5px 5px #00000038,
+    inset 0px 5px #ffffff36;
+  cursor: pointer;
+}
+button:active {
+  transform: translateY(5px);
+  box-shadow:
+    0px 5px black,
+    0px -5px black,
+    5px 0px black,
+    -5px 0px black,
+    inset 0px 5px #00000038;
 }

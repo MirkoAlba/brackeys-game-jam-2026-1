@@ -1,41 +1,21 @@
 // Hooks
 import { useEffect, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useKeyboardControls } from "@react-three/drei";
 
 // Components
 import { RigidBody, BallCollider, RapierRigidBody } from "@react-three/rapier";
 
 // Controllers
-import { GameManager } from "@/lib/controllers/game-manager";
-
-// Types
-import { type Controls } from "@/lib/types/controls";
+import { PlayerController } from "@/lib/controllers/player-controller";
 
 export function Player() {
   const body = useRef<RapierRigidBody>(null);
 
-  const [, getKeys] = useKeyboardControls();
-
-  // Init the controller with the state data
+  // Set the ref into the controller class
   useEffect(() => {
     if (body.current) {
-      GameManager.player.init({
-        rigidBodyRef: body.current,
-      });
+      PlayerController.getInstance().setRefs({ rigidBodyRef: body.current });
     }
   }, [body.current]);
-
-  // Game loop
-  useFrame(() => {
-    if (!body.current) return;
-
-    const controls = getKeys() as Controls;
-
-    GameManager.player.update({
-      controls,
-    });
-  });
 
   return (
     <RigidBody
